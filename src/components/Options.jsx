@@ -10,7 +10,7 @@ export const Options = ({ optionsName }) => {
             <input
               type="radio"
               id={name}
-              name={optionsName}
+              name="options"
               value={name}
               className="hidden peer"
               required

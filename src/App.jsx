@@ -97,6 +97,7 @@ function App() {
         </div>
         <CustomSlider
           defaultValue={25}
+          min={1}
           max={50}
           aria-label="Longitud de la contraseña"
           valueLabelDisplay="auto"
