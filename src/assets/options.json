@@ -1,0 +1,14 @@
+{
+  "easy": {
+    "title": "Easy to speak",
+    "name": "easy"
+  },
+  "medium": {
+    "title": "Easy to read",
+    "name": "medium"
+  },
+  "hard": {
+    "title": "All of characters",
+    "name": "hard"
+  }
+}

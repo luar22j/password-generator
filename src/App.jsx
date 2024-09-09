@@ -1,6 +1,8 @@
+import React, { useState } from "react";
 import "./App.css";
+import Options from "./components/Options";
 import Slider from "@mui/material/Slider";
-import { styled } from "@mui/material/styles";
+import { styled } from "@mui/material/styles"; // Importar useState
 
 const CustomSlider = styled(Slider)(({ theme }) => ({
   color: "#4b5563",
@@ -27,15 +29,39 @@ const CustomSlider = styled(Slider)(({ theme }) => ({
 }));
 
 function App() {
+  const [password, setPassword] = useState("");
+  const [length, setLength] = useState(25);
+  const [option, setOption] = useState("hard");
+
+  const generatePassword = () => {
+    const options = {
+      easy: "abcdefghijklmnopqrstuvwxyz",
+      medium: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      hard: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()",
+    };
+    const characters = options[option];
+    let generatedPassword = "";
+    for (let i = 0; i < length; i++) {
+      generatedPassword += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    setPassword(generatedPassword);
+  };
+
   return (
     <div className="flex items-center justify-center h-screen">
-      <div class="absolute top-0 z-[-2] h-screen w-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+      <div className="absolute top-0 z-[-2] h-screen w-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
       <div className="bg-white shadow-md bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] flex flex-col gap-5 py-5 px-8 rounded-md">
         <h1 className="text-5xl text-gray-800 drop-shadow font-bold">
           Password Generator
         </h1>
         <div className="w-full flex items-center justify-center gap-2">
-          <input className="w-full p-1 rounded border-2 border-gray-600 hover:border-gray-800 focus:border-gray-800 outline-none shadow focus:shadow-lg transition-all" />
+          <input
+            className="w-full p-1 rounded border-2 bg-transparent text-gray-800 border-gray-600 hover:border-gray-800 focus:border-gray-800 outline-none shadow focus:shadow-lg transition-all"
+            value={password}
+            readOnly
+          />
 
           <div className="flex items-center justify-center gap-2 text-gray-600 cursor-pointer">
             <svg
@@ -70,9 +96,21 @@ function App() {
           </div>
         </div>
         <CustomSlider
-          defaultValue={50}
+          defaultValue={25}
+          max={50}
           aria-label="Longitud de la contraseña"
           valueLabelDisplay="auto"
+          onChange={(e, newValue) => {
+            setLength(newValue); // Actualizar longitud
+            generatePassword(); // Generar nueva contraseña
+          }}
+          className="mt-5"
+        />
+        <Options
+          onChange={(newOption) => {
+            setOption(newOption); // Actualizar opción
+            generatePassword(); // Generar nueva contraseña
+          }}
         />
       </div>
     </div>
