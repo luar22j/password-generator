@@ -33,17 +33,33 @@ function App() {
   const [length, setLength] = useState(25);
   const [option, setOption] = useState("hard");
   const [copied, setCopied] = useState(false);
-  const [isValidPassword, setIsValidPassword] = useState(false); // Nuevo estado para la validez de la contraseña
+  const [validityMessage, setValidityMessage] = useState(""); // Nuevo estado para el mensaje de validez
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(password); // Copiar contraseña al portapapeles
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500); // Mostrar mensaje de copiado y luego volver a false
+    if (navigator.clipboard) {
+      navigator.clipboard
+        .writeText(password) // Copiar contraseña al portapapeles
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500); // Mostrar mensaje de copiado y luego volver a false
+        })
+        .catch((err) => console.error("Error al copiar: ", err));
+    } else {
+      // Método alternativo para copiar
+      const textArea = document.createElement("textarea");
+      textArea.value = password;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500); // Mostrar mensaje de copiado y luego volver a false
+    }
   };
 
-  const generatePassword = () => {
-    const respuestas = ["Muy mala", "Mala", "Buena", "Muy buena", "Excelente"];
+  const respuestas = ["Mala", "Buena", "Muy buena", "Excelente"];
 
+  const generatePassword = () => {
     const options = {
       easy: "abcdefghijklmnopqrstuvwxyz",
       medium: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -56,13 +72,14 @@ function App() {
         Math.floor(Math.random() * characters.length)
       );
     }
-    if (
-      generatedPassword.length > 10 &&
-      (option === "easy" || option === "medium" || option === "hard")
-    ) {
-      setIsValidPassword(true); // Contraseña válida
+    if (generatedPassword.length < 6) {
+      setValidityMessage(respuestas[0]); // "Mala"
+    } else if (generatedPassword.length <= 10) {
+      setValidityMessage(respuestas[1]); // "Buena"
+    } else if (generatedPassword.length <= 15) {
+      setValidityMessage(respuestas[2]); // "Muy buena"
     } else {
-      setIsValidPassword(false); // Contraseña no válida
+      setValidityMessage(respuestas[3]); // "Excelente"
     }
     setPassword(generatedPassword);
   };
@@ -87,23 +104,31 @@ function App() {
         <h1 className="lg:text-6xl text-4xl text-center text-gray-800 drop-shadow font-bold">
           Password Generator
         </h1>
+
         <div className="w-full flex items-end justify-center gap-2">
-          <div className="flex flex-col w-full h-full">
-            <div>
-              {isValidPassword ? "Contraseña válida" : "Contraseña no válida"}
-            </div>
-            <input
-              className="w-full p-1 rounded border-2 bg-transparent text-gray-800 border-gray-600 hover:border-gray-800 focus:border-gray-800 outline-none shadow focus:shadow-lg transition-all"
-              value={password}
-              type="text"
-              readOnly
-            />
-          </div>
+          <input
+            className={`w-full p-1 rounded border-2 bg-transparent text-gray-800 border-gray-600 hover:border-gray-800 focus:border-gray-800 outline-none shadow focus:shadow-lg transition-all ${
+              validityMessage === respuestas[0]
+                ? "border-red-600"
+                : validityMessage === respuestas[1]
+                ? "border-yellow-600"
+                : validityMessage === respuestas[2]
+                ? "border-green-600"
+                : validityMessage === respuestas[3]
+                ? "border-green-800"
+                : ""
+            } transition-all`}
+            value={password}
+            type="text"
+            readOnly
+          />
 
           <div className="flex items-center justify-center gap-1 text-gray-700 cursor-pointer">
             <div
               className="p-2 hover:bg-gray-200 hover:shadow rounded transition-all"
-              onClick={copyToClipboard}
+              onClick={() => {
+                copyToClipboard(); // Asegúrate de que se llame a la función al hacer clic
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +176,7 @@ function App() {
             setLength(newValue); // Actualizar longitud
             generatePassword(); // Generar nueva contraseña
           }}
-          className="mt-5"
+          className="my-5"
         />
         <Options
           onChange={(newOption) => {

@@ -4,7 +4,7 @@ export const Options = ({ onChange, checked }) => {
   // Aceptar la nueva prop
   return (
     <form className="flex items-center justify-center">
-      <ul className="flex justify-around lg:gap-0 gap-3 w-full">
+      <ul className="flex md:flex-row flex-col text-center justify-around lg:gap-0 gap-3 w-full">
         {Object.entries(optionsData).map(([key, { title, name }]) => {
           return (
             <li key={key}>
